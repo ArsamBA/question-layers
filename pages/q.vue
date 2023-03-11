@@ -1,5 +1,6 @@
 <template>
    <div class="question-layers">
+      <h5 class="displaying-array">mainQuestionLayer: {{ mainQuestionLayer }}</h5>
       <div class="utilities" v-if="utilities">
          <h5 class="displaying-array">questionLayer: {{ questionLayer }}</h5>
          <h5 class="displaying-array">firstQuestionArray: {{ firstQuestionArray }}</h5>
@@ -200,6 +201,7 @@ export default{
                answers: []
             } 
          ],
+         mainQuestionLayer:[],
          firstQuestionArray: [],
          secondQuestionArray: [],
       }
@@ -326,6 +328,7 @@ export default{
          this.firstQuestionPreview = false
          this.successMessage = true
          this.utilities = false
+         this.mainQuestionLayer.push({... this.firstQuestionArray})
       },
 
       secondQuestionSubmit(){

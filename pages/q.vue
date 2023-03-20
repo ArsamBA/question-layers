@@ -5,15 +5,13 @@
          <h5 class="displaying-array">questionLayer: {{ questionLayer }}</h5>
          <h5 class="displaying-array">firstQuestionArray: {{ firstQuestionArray }}</h5>
          <h5 class="displaying-array">secondQuestionArray: {{ secondQuestionArray }}</h5>
+         <h5 class="displaying-array">thirdQuestionArray: {{ thirdQuestionArray }}</h5>
       </div>
       <!-- first question -->
       <div v-if="firstBTN">
          <button class="add-first-button adding-answer-button margin-left" v-if="firstQuestion === null" @click="askToAddFirstQuestion">Add first Question</button>
       </div>
       <div class="first-question-wrapper" v-if="firstQuestion !== null">
-         <!-- <h5 class="displaying-array">{{ questionLayer }}</h5> -->
-         <!-- add new question / remove question -->
-         <!--  for each question -->
          <h1>Adding first Question:</h1>
          <div class="add-question-wrapper">
             <button class="adding-answer-button" v-if="newQuestion === null" @click="AddFirstQuestion">{{ addTheQuestion }}</button>
@@ -83,12 +81,49 @@
          <button class="submit-button" @click="secondQuestionSubmit">Submit</button>
       </div>
 
+      <!-- third question -->
+      <div v-if="thirdBTN">
+         <button class="add-first-button adding-answer-button margin-left" v-if="thirdQuestion === null" @click="askToAddThirdQuestion">Add third Question</button>
+      </div>
+      <div class="first-question-wrapper" v-if="thirdQuestion !== null">
+         <h1>Adding Third Question:</h1>
+         <div class="add-question-wrapper">
+            <button class="adding-answer-button" v-if="newQuestion === null" @click="AddFirstQuestion">{{ addTheQuestion }}</button>
+            <div class="first-question-add-question" v-if="newQuestion !== null">
+               <input class="question-input" type="text" v-model="newQuestion" placeholder="Please write the Question">
+               <button class="confirm-button" @click="addQuestion">confirm</button>
+            </div>
+            <p class="title-error-message error-message">Please Add question</p>
+         </div>
+         
+         <!-- selecting type -->
+         <select class="select-type" v-model="questionLayer[0].question_type">
+            <option disabled value="">Please select Question Type 🔽</option>
+            <option>Radio</option>
+            <option>Checkbox</option>
+         </select>
+         <p class="type-error-message error-message">Please Select your Question Type</p>
+
+         <!-- for each answer -->
+         <div class="first-question-add-answer" v-if="answerIsAllowed.includes(questionLayer[0].question_type)">
+            <button class="adding-answer-button" v-if="newAnswer === null" @click="AddFirstAnswer">{{ addTheAnswer }}</button>
+            <p class="answer-error-message error-message">Please Add at Least 2 Answer</p>
+            <div class="add-answer-wrapper" v-if="newAnswer !== null">
+               <input class="question-input" type="text" v-model="newAnswer" placeholder="Please write the Answer Options">
+               <button class="confirm-button" @click="addAnswer">confirm</button>
+            </div>
+            <h3>Answers:</h3>
+            <h4 class="display-options" v-for="(answer, index) in questionLayer[0].answers" :key="index">{{ answer }}</h4>
+         </div>
+         <button class="submit-button" @click="thirdQuestionSubmit">Submit</button>
+      </div>
+
+
       <!-- first question preview -->
       <div class="first-question-preview" v-if="firstQuestionPreview">
          <h5 class="rendering-array">{{ newArray }}</h5>
          <div class="newArray-wrapper" v-for="(createdQuestion, index) in firstQuestionArray" :key="index">
             <div v-if="radioQuestionCreated && createdQuestion.question_type === 'Radio'">
-               <!-- <h5 class="rendering-array">{{ firstQuestionArray }}</h5> -->
                <div class="rendered-question">
                   <h1 class="question-title">{{ index + 1 }}.</h1>
                   <h1 class="question-title">{{ createdQuestion.title }}</h1>
@@ -127,7 +162,6 @@
 
       <!-- second question preview -->
       <div class="first-question-preview" v-if="secondQuestionPreview">
-         <!-- <h5 class="rendering-array">{{ newArray }}</h5> -->
          <div class="newArray-wrapper" v-for="(createdQuestion, index) in secondQuestionArray" :key="index">
             <div v-if="radioQuestionCreated && createdQuestion.question_type === 'Radio'">
                <div class="rendered-question">
@@ -167,7 +201,53 @@
             <button class="submit-button" @click="secondQuestionEnd">End</button>
          </div>
       </div>
-      <h1 v-if="successMessage" class="Success-message">Your Questions Add to Your Website</h1>
+
+      <!-- third question preview -->
+      <div class="first-question-preview" v-if="thirdQuestionPreview">
+         <div class="newArray-wrapper" v-for="(createdQuestion, index) in thirdQuestionArray" :key="index">
+            <div v-if="radioQuestionCreated && createdQuestion.question_type === 'Radio'">
+               <div class="rendered-question">
+                  <h1 class="question-title">{{ index + 1 }}.</h1>
+                  <h1 class="question-title">{{ createdQuestion.title }}</h1>
+               </div>
+               <div class="question-answers radio-question-wrapper" v-for="answer in createdQuestion.answers" :key="answer">
+                  <input type="radio" :id="answer" name="question" :value="answer">
+                  <label :for="answer">{{ answer }}</label>
+               </div>
+               <div class="choosing-scenario">
+                  <select name="question" id="previousQuestionAnswerSelect">
+                     <option disabled selected>Choose an Answer: 🔽</option>
+                     <option v-for="lastQuestionAnswer in secondQuestionArray[0].answers" :key="lastQuestionAnswer" :value="lastQuestionAnswer">{{ lastQuestionAnswer }}</option>
+                     <option v-for="lastQuestionAnswer in secondQuestionArray[1].answers" :key="lastQuestionAnswer" :value="lastQuestionAnswer">{{ lastQuestionAnswer }}</option>
+                  </select>
+               </div>
+            </div>
+            <div v-if="checkboxQuestionCreated && createdQuestion.question_type === 'Checkbox'">
+               <div class="rendered-question">
+                  <h1 class="question-title">{{ index + 1 }}.</h1>
+                  <h1 class="question-title">{{ createdQuestion.title }}</h1>
+               </div>
+               <div class="question-answers checkbox-question-wrapper" v-for="answer in createdQuestion.answers" :key="answer">
+                  <input type="checkbox" :id="answer" name="question" :value="answer">
+                  <label :for="answer">{{ answer }}</label>
+               </div>
+               <div class="choosing-scenario">
+                  <select name="question" id="previousQuestionAnswerSelect">
+                     <option disabled selected>Choose an Answer: 🔽</option>
+                     <option v-for="lastQuestionAnswer in secondQuestionArray[0].answers" :key="lastQuestionAnswer" :value="lastQuestionAnswer">{{ lastQuestionAnswer }}</option>
+                     <option v-for="lastQuestionAnswer in secondQuestionArray[1].answers" :key="lastQuestionAnswer" :value="lastQuestionAnswer">{{ lastQuestionAnswer }}</option>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <div class="final-buttons">
+            <button class="submit-button" @click="thirdQuestionFinalSubmit">Next Question</button>
+            <button class="submit-button" @click="thirdQuestionEnd">End</button>
+         </div>
+      </div>
+
+      <!-- successMessage -->
+      <h1 v-if="successMessage" class="Success-message">Your Questions Added to Your Website</h1>
    </div>
 </template>
 <script>
@@ -181,8 +261,11 @@ export default{
          editFirstQuestionsTitle: false,
          secondQuestion: null,
          secondQuestionPreview: false,
+         thirdQuestion: null,
+         thirdQuestionPreview: false,
          firstBTN: true,
          secondBTN: false,
+         thirdBTN: false,
          addTheQuestion: 'Add Question',
          addTheAnswer: 'Add Answer',
          question: false,
@@ -204,6 +287,7 @@ export default{
          mainQuestionLayer:[],
          firstQuestionArray: [],
          secondQuestionArray: [],
+         thirdQuestionArray: [],
       }
    },
    mounted(){
@@ -227,6 +311,9 @@ export default{
       },
       askToAddSecondQuestion() {
          this.secondQuestion = ''
+      },
+      askToAddThirdQuestion() {
+         this.thirdQuestion = ''
       },
       addQuestion(){
          if (this.newQuestion){
@@ -254,6 +341,8 @@ export default{
             this.addTheAnswer = 'Add Answer'
          }
       },
+
+      // first question functionality
       firstQuestionSubmit(){
          console.log("🚀 ~ file: q.vue:133 ~ firstQuestionSubmit ~ this.questionLayer", this.questionLayer)
          console.log("🚀 ~ file: q.vue:134 ~ firstQuestionSubmit ~ this.questionLayer[0]", this.questionLayer[0])
@@ -320,6 +409,7 @@ export default{
       },
 
       firstQuestionFinalSubmit() {
+         this.mainQuestionLayer[0] = this.firstQuestionArray
          this.firstQuestionPreview = false
          this.secondBTN = true;
       },
@@ -328,9 +418,11 @@ export default{
          this.firstQuestionPreview = false
          this.successMessage = true
          this.utilities = false
-         this.mainQuestionLayer.push({... this.firstQuestionArray})
+         this.mainQuestionLayer[0] = this.firstQuestionArray
       },
 
+
+      // second question functionality
       secondQuestionSubmit(){
          if(this.questionLayer[0].question_type === 'Radio'){
             this.radioQuestionCreated = true
@@ -388,9 +480,11 @@ export default{
       },
 
       secondQuestionFinalSubmit() {
-         let select = document.querySelectorAll("#previousQuestionAnswerSelect");
-         let value = select.options[select.selectedIndex].value;
-         console.log("🚀 ~ file: q.vue:322 ~ secondQuestionFinalSubmit ~ value:", value)
+         this.secondQuestionPreview = false
+         this.secondQuestion = null
+         this.secondBTN = false
+         this.thirdBTN = true
+         this.mainQuestionLayer[1] = this.secondQuestionArray
       },
 
       secondQuestionEnd() {
@@ -399,6 +493,83 @@ export default{
          this.secondQuestion = null
          this.successMessage = true
          this.utilities = false
+         this.mainQuestionLayer[1] = this.secondQuestionArray
+      },
+
+      // third question functionality
+      thirdQuestionSubmit(){
+         if(this.questionLayer[0].question_type === 'Radio'){
+            this.radioQuestionCreated = true
+         } else if (this.questionLayer[0].question_type === 'Checkbox') {
+            this.checkboxQuestionCreated = true
+         }
+
+         if (this.questionLayer[0].title == ''){
+            let error = document.querySelector('.title-error-message')
+            error.style.display = 'initial'
+            setTimeout(() => {
+               error.style.display = 'none'
+            }, "3000")
+         }
+
+         if (this.questionLayer[0].question_type == ''){
+            let error = document.querySelector('.type-error-message')
+            error.style.display = 'initial'
+            setTimeout(() => {
+               error.style.display = 'none'
+            }, "3000")
+         }
+         
+         if(this.questionLayer[0].answers.length < 2 && this.questionLayer[0].question_type != ''){
+            let error = document.querySelector('.answer-error-message')
+            error.style.display = 'initial'
+            setTimeout(() => {
+               error.style.display = 'none'
+            }, "3000")
+         }
+         
+         if(this.questionLayer[0].answers.length >= 2 && this.questionLayer[0].question_type != '' && this.questionLayer[0].title != '' && this.questionLayer[0].answers != ''){
+            this.thirdQuestionArray.push({... this.questionLayer[0]})
+            this.questionLayer[0].title = '',
+            this.questionLayer[0].question_type = '',
+            this.questionLayer[0].answers = [],
+            this.firstQuestion = null,
+            this.secondQuestion = null,
+            this.thirdQuestionPreview = true;
+         }
+
+
+         // reseting add buttons
+         if(this.questionLayer[0].title !== '') {
+            this.addTheQuestion = 'Edit Question'
+         } else {
+            this.addTheQuestion = 'Add Question'
+         }
+
+         if(this.questionLayer[0].answers !== '') {
+            this.addTheAnswer = 'Add Another Answer'
+         } else {
+            this.addTheAnswer = 'Add Answer'
+         }
+
+      },
+      
+      thirdQuestionFinalSubmit() {
+         this.thirdQuestionPreview = false
+         this.thirdQuestion = null
+         this.thirdBTN = false
+         this.mainQuestionLayer[2] = this.thirdQuestionArray
+         this.utilities = false
+         this.successMessage = true
+      },
+
+      thirdQuestionEnd() {
+         this.thirdQuestionPreview = false
+         this.thirdBTN = false
+         this.thirdQuestion = null
+         this.successMessage = true
+         this.utilities = false
+         this.mainQuestionLayer[2] = this.thirdQuestionArray
       },
    }
 }
